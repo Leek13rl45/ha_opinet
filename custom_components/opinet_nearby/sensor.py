@@ -115,13 +115,22 @@ class OpinetStationSensor(CoordinatorEntity[OpinetCoordinator], SensorEntity):
         radius = data.get("radius", "")
 
         return {
+            "station_name": station["name"],
             "주유소명": station["name"],
+            "price": station["price"],
             "가격": f"{int(station['price']):,}원/L",
+            "distance": station["distance"],
             "거리": f"{station['distance']}km",
+            "address": station["address"],
             "주소": station["address"],
+            "brand": station["brand"],
             "브랜드": station["brand"],
+            "self_service": station["self"],
             "셀프여부": "셀프" if station["self"] else "일반",
+            "fuel_type": fuel_type,
             "연료종류": fuel_type,
+            "search_radius": radius,
             "검색반경": f"{radius}km",
+            "rank": self._rank,
             "순위": f"{self._rank}위",
         }

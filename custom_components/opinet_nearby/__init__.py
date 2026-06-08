@@ -32,7 +32,7 @@ _LOGGER = logging.getLogger(__name__)
 PLATFORMS = [Platform.SENSOR]
 
 
-type OpinetConfigEntry = ConfigEntry[OpinetCoordinator]
+OpinetConfigEntry = ConfigEntry[OpinetCoordinator]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: OpinetConfigEntry) -> bool:
@@ -135,7 +135,7 @@ class OpinetCoordinator(DataUpdateCoordinator):
                     except (ValueError, TypeError):
                         distance = 0.0
 
-                    brand_cd = item.get("POLL_DIV_CD", "")
+                    brand_cd = item.get("POLL_DIV_CD", "").strip().upper()
                     brand_nm = BRAND_MAP.get(brand_cd, "기타")
                     _LOGGER.warning(
                         "주유소 파싱 브랜드 - 상호: %s, 코드: %s, 한글명: %s",
