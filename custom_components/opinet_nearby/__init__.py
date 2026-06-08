@@ -37,6 +37,7 @@ async def fetch_station_address(session: aiohttp.ClientSession, api_key: str, st
     url = "https://www.opinet.co.kr/api/detailById.do"
     params = {
         "code": api_key,
+        "certkey": api_key,
         "id": station_id,
         "out": "json",
     }
