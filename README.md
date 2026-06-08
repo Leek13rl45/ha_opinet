@@ -15,11 +15,11 @@
 
 #### 방법 A: HACS로 설치 (권장)
 1. Home Assistant에서 **HACS**로 이동합니다.
-2. 우측 상단 **점 3개 메뉴** ➡️ **Custom repositories (커스텀 저장소)**를 선택합니다.
-3. 아래의 리포지토리 정보를 입력하고 **ADD (추가)**를 클릭합니다:
+2. 우측 상단 **점 3개 메뉴** ➡️ <strong>Custom repositories (커스텀 저장소)</strong>를 선택합니다.
+3. 아래의 리포지토리 정보를 입력하고 <strong>ADD (추가)</strong>를 클릭합니다:
    - **Repository**: `https://github.com/Leek13rl45/ha_opinet`
    - **Category**: `Integration (통합구성요소)`
-4. 목록에 추가된 **오피넷 주변 최저가 주유소**를 찾아 다운로드합니다.
+4. 목록에 추가된 <strong>오피넷 주변 최저가 주유소</strong>를 찾아 다운로드합니다.
 5. Home Assistant를 재시작합니다.
 
 #### 방법 B: 수동 설치
