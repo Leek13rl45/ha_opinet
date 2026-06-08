@@ -106,7 +106,9 @@ class OpinetNearbyConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(CONF_API_KEY): str,
                 vol.Optional(CONF_LATITUDE, default=default_lat): vol.Coerce(float),
                 vol.Optional(CONF_LONGITUDE, default=default_lon): vol.Coerce(float),
-                vol.Optional(CONF_RADIUS, default=DEFAULT_RADIUS): vol.In(RADIUS_OPTIONS),
+                vol.Optional(CONF_RADIUS, default=DEFAULT_RADIUS): vol.All(
+                    vol.Coerce(int), vol.In(RADIUS_OPTIONS)
+                ),
                 vol.Optional(CONF_FUEL_TYPE, default="휘발유"): vol.In(FUEL_TYPES),
                 vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL): vol.All(
                     vol.Coerce(int), vol.Range(min=10, max=1440)
@@ -142,6 +144,8 @@ class OpinetNearbyOptionsFlow(config_entries.OptionsFlow):
         current_radius = self.config_entry.options.get(
             CONF_RADIUS, self.config_entry.data.get(CONF_RADIUS, DEFAULT_RADIUS)
         )
+        if current_radius not in RADIUS_OPTIONS:
+            current_radius = DEFAULT_RADIUS
         current_fuel = self.config_entry.options.get(
             CONF_FUEL_TYPE, self.config_entry.data.get(CONF_FUEL_TYPE, "휘발유")
         )
@@ -152,7 +156,9 @@ class OpinetNearbyOptionsFlow(config_entries.OptionsFlow):
 
         schema = vol.Schema(
             {
-                vol.Optional(CONF_RADIUS, default=current_radius): vol.In(RADIUS_OPTIONS),
+                vol.Optional(CONF_RADIUS, default=current_radius): vol.All(
+                    vol.Coerce(int), vol.In(RADIUS_OPTIONS)
+                ),
                 vol.Optional(CONF_FUEL_TYPE, default=current_fuel): vol.In(FUEL_TYPES),
                 vol.Optional(CONF_SCAN_INTERVAL, default=current_interval): vol.All(
                     vol.Coerce(int), vol.Range(min=10, max=1440)

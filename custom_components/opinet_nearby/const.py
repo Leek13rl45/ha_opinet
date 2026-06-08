@@ -24,4 +24,4 @@ FUEL_CODES = {
     "LPG": "C004",
 }
 
-RADIUS_OPTIONS = [1, 3, 5, 10]
+RADIUS_OPTIONS = [1, 3, 5]
