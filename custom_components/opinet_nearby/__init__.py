@@ -76,9 +76,12 @@ class OpinetCoordinator(DataUpdateCoordinator):
         api_key = self.entry.data[CONF_API_KEY]
         lat = self.entry.data[CONF_LATITUDE]
         lon = self.entry.data[CONF_LONGITUDE]
-        radius = self.entry.options.get(
-            CONF_RADIUS, self.entry.data.get(CONF_RADIUS, 5)
-        )
+        try:
+            radius = int(self.entry.options.get(
+                CONF_RADIUS, self.entry.data.get(CONF_RADIUS, 5)
+            ))
+        except (ValueError, TypeError):
+            radius = 5
         fuel_type = self.entry.options.get(
             CONF_FUEL_TYPE, self.entry.data.get(CONF_FUEL_TYPE, "휘발유")
         )
