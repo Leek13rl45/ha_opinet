@@ -32,6 +32,27 @@ _LOGGER = logging.getLogger(__name__)
 PLATFORMS = [Platform.SENSOR]
 
 
+async def fetch_station_address(session: aiohttp.ClientSession, api_key: str, station_id: str) -> str:
+    """오피넷 detailById API를 호출하여 주유소의 지번 주소를 가져옵니다."""
+    url = "https://www.opinet.co.kr/api/detailById.do"
+    params = {
+        "code": api_key,
+        "id": station_id,
+        "out": "json",
+    }
+    try:
+        async with async_timeout.timeout(5):
+            async with session.get(url, params=params) as resp:
+                if resp.status == 200:
+                    data = await resp.json(content_type=None)
+                    oil_detail = data.get("RESULT", {}).get("OIL", [])
+                    if oil_detail:
+                        return oil_detail[0].get("VAN_ADR", "")
+    except Exception as err:
+        _LOGGER.debug("주소 조회 실패 (%s): %s", station_id, err)
+    return ""
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry["OpinetCoordinator"]) -> bool:
     """Set up opinet_nearby from a config entry."""
     coordinator = OpinetCoordinator(hass, entry)
@@ -103,61 +124,72 @@ class OpinetCoordinator(DataUpdateCoordinator):
                 "out": "json",
             }
 
-            try:
-                async with async_timeout.timeout(10):
-                    async with aiohttp.ClientSession() as session:
+            async with aiohttp.ClientSession() as session:
+                try:
+                    async with async_timeout.timeout(10):
                         async with session.get(OPINET_API_URL, params=params) as resp:
                             if resp.status != 200:
                                 raise UpdateFailed(f"HTTP {resp.status}")
                             data = await resp.json(content_type=None)
                             _LOGGER.warning("오피넷 API 원시 응답 데이터: %s", data)
-            except aiohttp.ClientError as err:
-                raise UpdateFailed(f"연결 오류: {err}") from err
-            except Exception as err:
-                raise UpdateFailed(f"데이터 조회 실패: {err}") from err
+                except aiohttp.ClientError as err:
+                    raise UpdateFailed(f"연결 오류: {err}") from err
+                except Exception as err:
+                    raise UpdateFailed(f"데이터 조회 실패: {err}") from err
 
-            stations = []
-            try:
-                oil_list = data.get("RESULT", {}).get("OIL", [])
-                for item in oil_list:
-                    price_str = item.get("PRICE", "0")
-                    try:
-                        price = int(float(price_str))
-                    except (ValueError, TypeError):
-                        price = 0
+                stations = []
+                try:
+                    oil_list = data.get("RESULT", {}).get("OIL", [])
+                    for item in oil_list:
+                        price_str = item.get("PRICE", "0")
+                        try:
+                            price = int(float(price_str))
+                        except (ValueError, TypeError):
+                            price = 0
 
-                    dist_str = item.get("DISTANCE", "0")
-                    try:
-                        distance = float(dist_str)
-                    except (ValueError, TypeError):
-                        distance = 0.0
+                        dist_str = item.get("DISTANCE", "0")
+                        try:
+                            distance = float(dist_str)
+                        except (ValueError, TypeError):
+                            distance = 0.0
 
-                    brand_cd = item.get("POLL_DIV_CD", "").strip().upper()
-                    brand_nm = BRAND_MAP.get(brand_cd, "기타")
-                    _LOGGER.warning(
-                        "주유소 파싱 브랜드 - 상호: %s, 코드: %s, 한글명: %s",
-                        item.get("OS_NM"), brand_cd, brand_nm
+                        brand_cd = item.get("POLL_DIV_CD", "").strip().upper()
+                        brand_nm = BRAND_MAP.get(brand_cd, "기타")
+                        _LOGGER.warning(
+                            "주유소 파싱 브랜드 - 상호: %s, 코드: %s, 한글명: %s",
+                            item.get("OS_NM"), brand_cd, brand_nm
+                        )
+
+                        stations.append(
+                            {
+                                "name": item.get("OS_NM", "알 수 없음"),
+                                "price": price,
+                                "distance": round(distance / 1000, 2),  # km
+                                "address": "",
+                                "brand": brand_nm,
+                                "id": item.get("UNI_ID", ""),
+                                "self": item.get("SELF_YN", "N") == "Y",
+                            }
+                        )
+                except Exception as err:
+                    raise UpdateFailed(f"데이터 파싱 오류: {err}") from err
+
+                if not stations:
+                    _LOGGER.warning("반경 %skm 내 주유소를 찾을 수 없습니다.", radius)
+
+                # 가격순 정렬 후 top 2
+                stations.sort(key=lambda x: x["price"])
+
+                # 1위, 2위 주소 상세 조회 (세션 재사용)
+                if len(stations) > 0:
+                    stations[0]["address"] = await fetch_station_address(
+                        session, api_key, stations[0]["id"]
+                    )
+                if len(stations) > 1:
+                    stations[1]["address"] = await fetch_station_address(
+                        session, api_key, stations[1]["id"]
                     )
 
-                    stations.append(
-                        {
-                            "name": item.get("OS_NM", "알 수 없음"),
-                            "price": price,
-                            "distance": round(distance / 1000, 2),  # km
-                            "address": item.get("VAN_ADR", ""),
-                            "brand": brand_nm,
-                            "id": item.get("UNI_ID", ""),
-                            "self": item.get("SELF_YN", "N") == "Y",
-                        }
-                    )
-            except Exception as err:
-                raise UpdateFailed(f"데이터 파싱 오류: {err}") from err
-
-            if not stations:
-                _LOGGER.warning("반경 %skm 내 주유소를 찾을 수 없습니다.", radius)
-
-            # 가격순 정렬 후 top 2
-            stations.sort(key=lambda x: x["price"])
             return {
                 "stations": stations[:10],
                 "rank1": stations[0] if len(stations) > 0 else None,
