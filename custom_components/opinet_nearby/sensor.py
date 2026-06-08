@@ -59,7 +59,16 @@ class OpinetStationSensor(CoordinatorEntity, SensorEntity):
         self._entry = entry
         self._base_name = base_name
         self._attr_unique_id = f"{entry.entry_id}_rank{rank}"
-        self._attr_name = f"{base_name} {rank}위"
+
+    @property
+    def name(self) -> str:
+        """Return the name of the sensor."""
+        data = self.coordinator.data
+        if data:
+            station = data.get(f"rank{self._rank}")
+            if station and station.get("name"):
+                return f"{self._base_name} {self._rank}위 ({station['name']})"
+        return f"{self._base_name} {self._rank}위"
 
     @property
     def device_info(self) -> DeviceInfo:
@@ -82,7 +91,7 @@ class OpinetStationSensor(CoordinatorEntity, SensorEntity):
         )
 
     @property
-    def native_value(self) -> float | None:
+    def native_value(self) -> int | None:
         """Return the gas price as the state."""
         data = self.coordinator.data
         if not data:
@@ -90,7 +99,7 @@ class OpinetStationSensor(CoordinatorEntity, SensorEntity):
         station = data.get(f"rank{self._rank}")
         if not station:
             return None
-        return station["price"]
+        return int(station["price"])
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:

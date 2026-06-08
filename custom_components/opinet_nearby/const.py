@@ -26,6 +26,17 @@ FUEL_CODES = {
 
 RADIUS_OPTIONS = [1, 3, 5]
 
+BRAND_MAP = {
+    "SKE": "SK에너지",
+    "GSC": "GS칼텍스",
+    "HDO": "HD현대오일뱅크",
+    "SOL": "S-OIL",
+    "RTE": "도로공사 알뜰",
+    "RTX": "알뜰주유소",
+    "NHO": "농협 알뜰",
+    "ETC": "자가상표/기타",
+}
+
 
 def wgs84_to_katec(lon: float, lat: float) -> tuple[float, float]:
     """Convert WGS84 (lon, lat) coordinates to KATEC (x, y) coordinates for Opinet."""

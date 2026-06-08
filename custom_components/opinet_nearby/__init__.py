@@ -24,6 +24,7 @@ from .const import (
     OPINET_API_URL,
     FUEL_CODES,
     wgs84_to_katec,
+    BRAND_MAP,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -124,9 +125,9 @@ class OpinetCoordinator(DataUpdateCoordinator):
                 for item in oil_list:
                     price_str = item.get("PRICE", "0")
                     try:
-                        price = float(price_str)
+                        price = int(float(price_str))
                     except (ValueError, TypeError):
-                        price = 0.0
+                        price = 0
 
                     dist_str = item.get("DISTANCE", "0")
                     try:
@@ -134,13 +135,16 @@ class OpinetCoordinator(DataUpdateCoordinator):
                     except (ValueError, TypeError):
                         distance = 0.0
 
+                    brand_cd = item.get("POLL_DIV_CD", "")
+                    brand_nm = BRAND_MAP.get(brand_cd, "기타")
+
                     stations.append(
                         {
                             "name": item.get("OS_NM", "알 수 없음"),
                             "price": price,
                             "distance": round(distance / 1000, 2),  # km
                             "address": item.get("VAN_ADR", ""),
-                            "brand": item.get("POLL_DIV_NM", ""),
+                            "brand": brand_nm,
                             "id": item.get("UNI_ID", ""),
                             "self": item.get("SELF_YN", "N") == "Y",
                         }
