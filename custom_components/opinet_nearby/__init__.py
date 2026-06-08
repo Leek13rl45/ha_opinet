@@ -137,6 +137,10 @@ class OpinetCoordinator(DataUpdateCoordinator):
 
                     brand_cd = item.get("POLL_DIV_CD", "")
                     brand_nm = BRAND_MAP.get(brand_cd, "기타")
+                    _LOGGER.warning(
+                        "주유소 파싱 브랜드 - 상호: %s, 코드: %s, 한글명: %s",
+                        item.get("OS_NM"), brand_cd, brand_nm
+                    )
 
                     stations.append(
                         {
