@@ -27,6 +27,7 @@ from .const import (
     FUEL_TYPES,
     FUEL_CODES,
     RADIUS_OPTIONS,
+    wgs84_to_katec,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -34,10 +35,11 @@ _LOGGER = logging.getLogger(__name__)
 
 async def _validate_api_key(api_key: str, lat: float, lon: float) -> str | None:
     """Validate the API key by making a test request. Returns error string or None."""
+    x, y = wgs84_to_katec(lon, lat)
     params = {
         "code": api_key,
-        "x": lon,
-        "y": lat,
+        "x": x,
+        "y": y,
         "radius": 5000,
         "prodcd": "B027",
         "sort": 1,

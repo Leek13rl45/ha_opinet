@@ -23,6 +23,7 @@ from .const import (
     DEFAULT_SCAN_INTERVAL,
     OPINET_API_URL,
     FUEL_CODES,
+    wgs84_to_katec,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -87,10 +88,12 @@ class OpinetCoordinator(DataUpdateCoordinator):
         )
         prod_cd = FUEL_CODES.get(fuel_type, "B027")
 
+        x, y = wgs84_to_katec(lon, lat)
+
         params = {
             "code": api_key,
-            "x": lon,
-            "y": lat,
+            "x": x,
+            "y": y,
             "radius": radius * 1000,  # meters
             "prodcd": prod_cd,
             "sort": 1,  # 가격순 정렬

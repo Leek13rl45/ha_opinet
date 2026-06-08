@@ -25,3 +25,18 @@ FUEL_CODES = {
 }
 
 RADIUS_OPTIONS = [1, 3, 5]
+
+
+def wgs84_to_katec(lon: float, lat: float) -> tuple[float, float]:
+    """Convert WGS84 (lon, lat) coordinates to KATEC (x, y) coordinates for Opinet."""
+    from pyproj import Transformer
+
+    katec_proj = (
+        "+proj=tmerc +lat_0=38 +lon_0=128 +k=0.9999 +x_0=400000 +y_0=600000 "
+        "+ellps=bessel +units=m +no_defs "
+        "+towgs84=-115.80,474.99,674.11,1.16,-2.31,-1.63,6.43"
+    )
+    transformer = Transformer.from_crs("EPSG:4326", katec_proj, always_xy=True)
+    x, y = transformer.transform(lon, lat)
+    return x, y
+

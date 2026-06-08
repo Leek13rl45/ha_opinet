@@ -3,7 +3,7 @@
   "name": "오피넷 주변 최저가 주유소",
   "version": "1.0.0",
   "documentation": "https://github.com/Leek13rl45/ha_opinet",
-  "requirements": [],
+  "requirements": ["pyproj"],
   "dependencies": [],
   "codeowners": [],
   "iot_class": "cloud_polling",
