@@ -23,11 +23,11 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    entry: ConfigEntry[OpinetCoordinator],
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up sensors from config entry."""
-    coordinator: OpinetCoordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data
 
     base_name = entry.data.get(CONF_NAME, "") or f"주유소 최저가"
 
@@ -50,7 +50,7 @@ class OpinetStationSensor(CoordinatorEntity[OpinetCoordinator], SensorEntity):
     def __init__(
         self,
         coordinator: OpinetCoordinator,
-        entry: ConfigEntry,
+        entry: ConfigEntry[OpinetCoordinator],
         rank: int,
         base_name: str,
     ) -> None:
