@@ -43,7 +43,6 @@ class OpinetStationSensor(CoordinatorEntity, SensorEntity):
     """Sensor representing a ranked cheapest gas station."""
 
     _attr_device_class = SensorDeviceClass.MONETARY
-    _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = "KRW/L"
     _attr_icon = "mdi:gas-station"
 
