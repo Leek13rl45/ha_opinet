@@ -1,0 +1,38 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "오피넷 주변 최저가 주유소",
+        "description": "오피넷 API 키와 기준 위치를 설정하세요. API 키는 opinet.co.kr에서 무료로 발급받을 수 있습니다.",
+        "data": {
+          "api_key": "오피넷 API 키",
+          "latitude": "기준 위도",
+          "longitude": "기준 경도",
+          "radius": "검색 반경 (km)",
+          "fuel_type": "연료 종류",
+          "name": "이름 (옵션)"
+        }
+      }
+    },
+    "error": {
+      "invalid_api_key": "API 키가 올바르지 않습니다.",
+      "cannot_connect": "오피넷 서버에 연결할 수 없습니다.",
+      "no_stations": "해당 반경 내 주유소를 찾을 수 없습니다."
+    },
+    "abort": {
+      "already_configured": "이미 설정된 위치입니다."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "설정 변경",
+        "data": {
+          "radius": "검색 반경 (km)",
+          "fuel_type": "연료 종류",
+          "scan_interval": "갱신 주기 (분)"
+        }
+      }
+    }
+  }
+}
