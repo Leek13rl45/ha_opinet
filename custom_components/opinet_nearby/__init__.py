@@ -32,10 +32,7 @@ _LOGGER = logging.getLogger(__name__)
 PLATFORMS = [Platform.SENSOR]
 
 
-OpinetConfigEntry = ConfigEntry[OpinetCoordinator]
-
-
-async def async_setup_entry(hass: HomeAssistant, entry: OpinetConfigEntry) -> bool:
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry["OpinetCoordinator"]) -> bool:
     """Set up opinet_nearby from a config entry."""
     coordinator = OpinetCoordinator(hass, entry)
     await coordinator.async_config_entry_first_refresh()
@@ -47,12 +44,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: OpinetConfigEntry) -> bo
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: OpinetConfigEntry) -> bool:
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry["OpinetCoordinator"]) -> bool:
     """Unload a config entry."""
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
 
-async def async_update_listener(hass: HomeAssistant, entry: OpinetConfigEntry) -> None:
+async def async_update_listener(hass: HomeAssistant, entry: ConfigEntry["OpinetCoordinator"]) -> None:
     """Handle options update."""
     await hass.config_entries.async_reload(entry.entry_id)
 
