@@ -111,6 +111,7 @@ class OpinetCoordinator(DataUpdateCoordinator):
                         if resp.status != 200:
                             raise UpdateFailed(f"HTTP {resp.status}")
                         data = await resp.json(content_type=None)
+                        _LOGGER.warning("오피넷 API 원시 응답 데이터: %s", data)
         except aiohttp.ClientError as err:
             raise UpdateFailed(f"연결 오류: {err}") from err
         except Exception as err:
