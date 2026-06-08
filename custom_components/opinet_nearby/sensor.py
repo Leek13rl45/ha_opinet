@@ -39,9 +39,10 @@ async def async_setup_entry(
     )
 
 
-class OpinetStationSensor(CoordinatorEntity, SensorEntity):
+class OpinetStationSensor(CoordinatorEntity[OpinetCoordinator], SensorEntity):
     """Sensor representing a ranked cheapest gas station."""
 
+    _attr_has_entity_name = True
     _attr_device_class = SensorDeviceClass.MONETARY
     _attr_native_unit_of_measurement = "KRW/L"
     _attr_icon = "mdi:gas-station"
@@ -66,8 +67,8 @@ class OpinetStationSensor(CoordinatorEntity, SensorEntity):
         if data:
             station = data.get(f"rank{self._rank}")
             if station and station.get("name"):
-                return f"{self._base_name} {self._rank}위 ({station['name']})"
-        return f"{self._base_name} {self._rank}위"
+                return f"{self._rank}위 ({station['name']})"
+        return f"{self._rank}위"
 
     @property
     def device_info(self) -> DeviceInfo:
