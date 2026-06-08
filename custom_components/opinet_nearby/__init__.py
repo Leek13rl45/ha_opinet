@@ -89,6 +89,10 @@ class OpinetCoordinator(DataUpdateCoordinator):
         prod_cd = FUEL_CODES.get(fuel_type, "B027")
 
         x, y = wgs84_to_katec(lon, lat)
+        _LOGGER.warning(
+            "오피넷 API 호출 좌표 정보 - 입력 위경도: (%s, %s), 변환 KATEC: (%s, %s), 반경: %s km",
+            lat, lon, x, y, radius
+        )
 
         params = {
             "code": api_key,
